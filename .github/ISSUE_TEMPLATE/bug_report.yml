@@ -1,0 +1,64 @@
+name: Bug report
+description: Report a reproducible problem in tmuxes.
+title: "bug: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve tmuxes. Please remove secrets, hostnames,
+        private keys, and passwords before pasting logs or YAML.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What went wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: List the smallest steps that reproduce the issue.
+      placeholder: |
+        1. Add a server with ...
+        2. Open ...
+        3. Tap ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: tmuxes version or commit
+      placeholder: v1.0.0 or commit SHA
+  - type: input
+    id: android
+    attributes:
+      label: Android version and device
+      placeholder: Android 15, Pixel 8
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Paste relevant sanitized logs or crash bundle excerpts.
+      render: text
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Safety checks
+      options:
+        - label: I removed private keys, passwords, tokens, and hostnames from this report.
+          required: true

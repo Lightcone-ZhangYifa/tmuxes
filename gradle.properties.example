@@ -1,0 +1,12 @@
+# Optional release signing values.
+#
+# Do not commit real keystores or passwords. Put real values in one of:
+# - ~/.gradle/gradle.properties
+# - local.properties in this repo root
+# - CI secrets exposed as environment variables
+#
+# RELEASE_STORE_FILE may be absolute or relative to app/.
+RELEASE_STORE_FILE=/absolute/path/to/tmuxes-release.jks
+RELEASE_STORE_PASSWORD=change-me
+RELEASE_KEY_ALIAS=tmuxes
+RELEASE_KEY_PASSWORD=change-me

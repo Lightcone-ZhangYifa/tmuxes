@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="launcher_icon_default_dark_bg">#17365F</color>
+    <color name="launcher_icon_default_light_bg">#D9E2FF</color>
+    <color name="launcher_icon_blue_dark_bg">#43536C</color>
+    <color name="launcher_icon_blue_light_bg">#CED6E8</color>
+    <color name="launcher_icon_violet_dark_bg">#4C436C</color>
+    <color name="launcher_icon_violet_light_bg">#D7CEE8</color>
+    <color name="launcher_icon_cyan_dark_bg">#43676C</color>
+    <color name="launcher_icon_cyan_light_bg">#CEE3E8</color>
+    <color name="launcher_icon_teal_dark_bg">#436C66</color>
+    <color name="launcher_icon_teal_light_bg">#CEE8E6</color>
+    <color name="launcher_icon_green_dark_bg">#436C52</color>
+    <color name="launcher_icon_green_light_bg">#CEE8D8</color>
+    <color name="launcher_icon_rose_dark_bg">#6C4348</color>
+    <color name="launcher_icon_rose_light_bg">#E8CED4</color>
+    <color name="launcher_icon_orange_dark_bg">#6C5843</color>
+    <color name="launcher_icon_orange_light_bg">#E8D5CE</color>
+    <color name="launcher_icon_amber_dark_bg">#6C6243</color>
+    <color name="launcher_icon_amber_light_bg">#E8D8CE</color>
+</resources>

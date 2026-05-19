@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/Lightcone-ZhangYifa/tmuxes/security/advisories/new
+    about: Report sensitive security issues privately.
+  - name: Questions and usage help
+    url: https://github.com/Lightcone-ZhangYifa/tmuxes/discussions
+    about: Use GitHub Discussions for setup questions and ideas.

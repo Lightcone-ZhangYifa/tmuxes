@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="#FFCDD6F4">
+
+    <!-- ">" chevron -->
+    <path
+        android:pathData="M4,17.27L4,15.15L9.46,12L4,8.85L4,6.73L12,11.18L12,12.82Z"
+        android:fillColor="#FFFFFF" />
+
+    <!-- "_" underscore -->
+    <path
+        android:pathData="M12,16L20,16L20,18L12,18Z"
+        android:fillColor="#FFFFFF" />
+
+</vector>

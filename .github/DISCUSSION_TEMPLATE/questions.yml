@@ -1,0 +1,21 @@
+title: "[Question]: "
+labels:
+  - question
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please remove private keys, passwords, hostnames, IP addresses, and
+        production command output before posting.
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What are you trying to understand or set up?
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Android version, build source, sanitized config, or logs if relevant.

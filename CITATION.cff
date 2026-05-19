@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use tmuxes in research, writing, demos, or derivative work, please cite it."
+title: "tmuxes"
+abstract: "An Android SSH and tmux client with persistent sessions, live terminal widgets, and YAML-first configuration."
+authors:
+  - family-names: "Zhang"
+    given-names: "Yifa"
+repository-code: "https://github.com/Lightcone-ZhangYifa/tmuxes"
+url: "https://github.com/Lightcone-ZhangYifa/tmuxes"
+license: "GPL-3.0-only"
+version: "1.0.0"
+date-released: "2026-05-19"
+keywords:
+  - android
+  - ssh
+  - tmux
+  - terminal
+  - kotlin
+  - jetpack-compose

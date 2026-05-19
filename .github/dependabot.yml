@@ -1,0 +1,34 @@
+version: 2
+
+updates:
+  - package-ecosystem: gradle
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+    open-pull-requests-limit: 10
+    groups:
+      android-build:
+        patterns:
+          - com.android.application
+          - com.google.devtools.ksp
+          - org.jetbrains.kotlin.*
+      androidx:
+        patterns:
+          - androidx.*
+      runtime-libraries:
+        patterns:
+          - com.hierynomus:*
+          - org.bouncycastle:*
+          - org.jetbrains.kotlinx:*
+          - org.yaml:*
+          - io.github.Rosemoe.sora-editor:*
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:30"
+    open-pull-requests-limit: 5

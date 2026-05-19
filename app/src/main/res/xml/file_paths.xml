@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <cache-path
+        name="export_keys"
+        path="export_keys/" />
+    <!-- Debug bundles (DebugBundle.export) live at the root of cacheDir. -->
+    <cache-path
+        name="debug_bundle"
+        path="." />
+</paths>

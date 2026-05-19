@@ -1,0 +1,114 @@
+{
+  "name": "Catppuccin Mocha",
+  "settings": [
+    {
+      "settings": {
+        "foreground": "#cdd6f4",
+        "background": "#1e1e2e",
+        "selection": "#45475a",
+        "lineHighlight": "#313244",
+        "caret": "#f5e0dc"
+      }
+    },
+    {
+      "name": "Comment",
+      "scope": "comment, comment.line.number-sign.yaml, punctuation.definition.comment.yaml, punctuation.whitespace.comment.leading.yaml",
+      "settings": { "foreground": "#6c7086", "fontStyle": "italic" }
+    },
+    {
+      "name": "Mapping Key",
+      "scope": "entity.name.tag.yaml",
+      "settings": { "foreground": "#89b4fa" }
+    },
+    {
+      "name": "String Quoted",
+      "scope": "string.quoted.double.yaml, string.quoted.single.yaml",
+      "settings": { "foreground": "#a6e3a1" }
+    },
+    {
+      "name": "String Punctuation",
+      "scope": "punctuation.definition.string.begin.yaml, punctuation.definition.string.end.yaml",
+      "settings": { "foreground": "#a6e3a1" }
+    },
+    {
+      "name": "String Unquoted",
+      "scope": "string.unquoted.plain.out.yaml, string.unquoted.plain.in.yaml, string.unquoted.block.yaml",
+      "settings": { "foreground": "#cdd6f4" }
+    },
+    {
+      "name": "Boolean",
+      "scope": "constant.language.boolean.yaml",
+      "settings": { "foreground": "#cba6f7" }
+    },
+    {
+      "name": "Null and Merge",
+      "scope": "constant.language.null.yaml, constant.language.merge.yaml, constant.language.value.yaml",
+      "settings": { "foreground": "#cba6f7" }
+    },
+    {
+      "name": "Number",
+      "scope": "constant.numeric.integer.yaml, constant.numeric.float.yaml, constant.numeric.yaml-version.yaml",
+      "settings": { "foreground": "#fab387" }
+    },
+    {
+      "name": "Timestamp",
+      "scope": "constant.other.timestamp.yaml",
+      "settings": { "foreground": "#fab387" }
+    },
+    {
+      "name": "Key-Value Separator",
+      "scope": "punctuation.separator.key-value.mapping.yaml, punctuation.separator.mapping.yaml, punctuation.separator.sequence.yaml",
+      "settings": { "foreground": "#94e2d5" }
+    },
+    {
+      "name": "Sequence Item",
+      "scope": "punctuation.definition.block.sequence.item.yaml",
+      "settings": { "foreground": "#94e2d5" }
+    },
+    {
+      "name": "Flow Brackets",
+      "scope": "punctuation.definition.mapping.begin.yaml, punctuation.definition.mapping.end.yaml, punctuation.definition.sequence.begin.yaml, punctuation.definition.sequence.end.yaml",
+      "settings": { "foreground": "#94e2d5" }
+    },
+    {
+      "name": "Block Scalar",
+      "scope": "keyword.control.flow.block-scalar.literal.yaml, keyword.control.flow.block-scalar.folded.yaml, storage.modifier.chomping-indicator.yaml, constant.numeric.indentation-indicator.yaml",
+      "settings": { "foreground": "#cba6f7" }
+    },
+    {
+      "name": "Directive",
+      "scope": "keyword.other.directive.yaml.yaml, keyword.other.directive.tag.yaml, punctuation.definition.directive.begin.yaml, support.other.directive.reserved.yaml",
+      "settings": { "foreground": "#cba6f7" }
+    },
+    {
+      "name": "Anchor",
+      "scope": "entity.name.type.anchor.yaml, keyword.control.property.anchor.yaml, punctuation.definition.anchor.yaml",
+      "settings": { "foreground": "#f9e2af", "fontStyle": "underline" }
+    },
+    {
+      "name": "Alias",
+      "scope": "variable.other.alias.yaml, keyword.control.flow.alias.yaml, punctuation.definition.alias.yaml",
+      "settings": { "foreground": "#f9e2af" }
+    },
+    {
+      "name": "Tag Handle",
+      "scope": "storage.type.tag-handle.yaml, support.type.tag-prefix.yaml",
+      "settings": { "foreground": "#f5c2e7" }
+    },
+    {
+      "name": "Document Markers",
+      "scope": "entity.other.document.begin.yaml, entity.other.document.end.yaml",
+      "settings": { "foreground": "#9399b2" }
+    },
+    {
+      "name": "Escape Character",
+      "scope": "constant.character.escape.yaml, constant.character.escape.double-quoted.newline.yaml, constant.character.escape.single-quoted.yaml",
+      "settings": { "foreground": "#f5c2e7" }
+    },
+    {
+      "name": "Invalid",
+      "scope": "invalid.illegal",
+      "settings": { "foreground": "#f38ba8" }
+    }
+  ]
+}

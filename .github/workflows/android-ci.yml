@@ -1,0 +1,48 @@
+name: Android CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Build, test, lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Verify Gradle wrapper
+        run: ./gradlew --version
+
+      - name: Compile, test, design rules, lint
+        run: ./gradlew --no-daemon compileDebugKotlin testDebugUnitTest checkDesignRules lintDebug
+
+      - name: Upload lint report on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lint-debug-report
+          path: app/build/reports/lint-results-debug.html
+          if-no-files-found: ignore

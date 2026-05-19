@@ -1,0 +1,31 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+*.swp
+*.swo
+/build
+/app/build
+/dist
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+*.apk
+*.aab
+*.apks
+*.idsig
+
+# Signing material must never be published.
+*.jks
+*.keystore
+*.p12
+*.pfx
+keystore.properties
+signing.properties
+
+# Local environment and tool state.
+.env
+.env.*
+.vscode/

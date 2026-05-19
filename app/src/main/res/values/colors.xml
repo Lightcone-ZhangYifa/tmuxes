@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Catppuccin Mocha palette -->
+    <color name="ctp_rosewater">#FFF5E0DC</color>
+    <color name="ctp_flamingo">#FFF2CDCD</color>
+    <color name="ctp_pink">#FFF5C2E7</color>
+    <color name="ctp_mauve">#FFCBA6F7</color>
+    <color name="ctp_red">#FFF38BA8</color>
+    <color name="ctp_maroon">#FFEBA0AC</color>
+    <color name="ctp_peach">#FFFAB387</color>
+    <color name="ctp_yellow">#FFF9E2AF</color>
+    <color name="ctp_green">#FFA6E3A1</color>
+    <color name="ctp_teal">#FF94E2D5</color>
+    <color name="ctp_sky">#FF89DCEB</color>
+    <color name="ctp_sapphire">#FF74C7EC</color>
+    <color name="ctp_blue">#FF89B4FA</color>
+    <color name="ctp_lavender">#FFB4BEFE</color>
+
+    <color name="ctp_text">#FFCDD6F4</color>
+    <color name="ctp_subtext1">#FFBAC2DE</color>
+    <color name="ctp_subtext0">#FFA6ADC8</color>
+    <color name="ctp_overlay2">#FF9399B2</color>
+    <color name="ctp_overlay1">#FF7F849C</color>
+    <color name="ctp_overlay0">#FF6C7086</color>
+    <color name="ctp_surface2">#FF585B70</color>
+    <color name="ctp_surface1">#FF45475A</color>
+    <color name="ctp_surface0">#FF313244</color>
+    <color name="ctp_base">#FF1E1E2E</color>
+    <color name="ctp_mantle">#FF181825</color>
+    <color name="ctp_crust">#FF11111B</color>
+</resources>
