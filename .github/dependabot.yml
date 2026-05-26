@@ -11,6 +11,7 @@ updates:
     groups:
       android-build:
         patterns:
+          - gradle-wrapper
           - com.android.application
           - com.google.devtools.ksp
           - org.jetbrains.kotlin.*
