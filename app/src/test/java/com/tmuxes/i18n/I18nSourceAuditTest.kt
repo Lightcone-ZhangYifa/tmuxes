@@ -108,8 +108,8 @@ class I18nSourceAuditTest {
         val gradle = projectFile("build.gradle.kts").readText()
         val db = projectFile("src/main/java/com/tmuxes/data/db/AppDatabase.kt").readText()
 
-        assertTrue(gradle.contains("versionCode = 3"))
-        assertTrue(gradle.contains("versionName = \"1.0.2\""))
+        assertTrue(gradle.contains("versionCode = 4"))
+        assertTrue(gradle.contains("versionName = \"1.0.3\""))
         assertTrue(db.contains("version = 1"))
         assertTrue(db.contains("\"tmuxes_database_v1\""))
         assertFalse(db.contains("add" + "Mig" + "rations"))

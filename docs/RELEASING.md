@@ -9,8 +9,8 @@ maintainer private keys.
 Version values live in [app/build.gradle.kts](../app/build.gradle.kts):
 
 ```kotlin
-versionCode = 3
-versionName = "1.0.2"
+versionCode = 4
+versionName = "1.0.3"
 ```
 
 Before a public release:

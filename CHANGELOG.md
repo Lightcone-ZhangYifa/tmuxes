@@ -5,6 +5,17 @@ All notable public changes should be recorded here.
 This project follows a pragmatic changelog format inspired by Keep a
 Changelog. Versioning will follow SemVer once public binary releases begin.
 
+## [1.0.3] - 2026-05-26
+
+### Added
+
+- Added terminal appearance controls for showing or hiding the Android status
+  bar while a terminal is open.
+- Added a terminal status-bar-area behavior selector so users can reserve the
+  top safe area by default or intentionally draw behind the status bar.
+- Added Simplified Chinese translations for the new terminal status bar
+  settings.
+
 ## [1.0.2] - 2026-05-26
 
 ### Changed
