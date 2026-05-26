@@ -28,7 +28,14 @@ class I18nSourceAuditTest {
             "Failed to add server: {error}",
             "Failed to create session: {error}",
             "Snippet duplicated",
-            "Modified (Auto-saving)"
+            "Modified (Auto-saving)",
+            "System Bars",
+            "System Status Bar",
+            "Show the Android status bar while the terminal is open",
+            "Status Bar Area",
+            "How the terminal uses the top status bar and camera cutout area",
+            "Reserve safe area",
+            "Draw behind status bar"
         )
 
         messages.forEach { message ->
@@ -101,8 +108,8 @@ class I18nSourceAuditTest {
         val gradle = projectFile("build.gradle.kts").readText()
         val db = projectFile("src/main/java/com/tmuxes/data/db/AppDatabase.kt").readText()
 
-        assertTrue(gradle.contains("versionCode = 3"))
-        assertTrue(gradle.contains("versionName = \"1.0.2\""))
+        assertTrue(gradle.contains("versionCode = 4"))
+        assertTrue(gradle.contains("versionName = \"1.0.3\""))
         assertTrue(db.contains("version = 1"))
         assertTrue(db.contains("\"tmuxes_database_v1\""))
         assertFalse(db.contains("add" + "Mig" + "rations"))

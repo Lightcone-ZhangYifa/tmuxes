@@ -68,6 +68,11 @@ object SettingScreens {
             SettingItem.Reg(Settings.terminalPadding)
         ))
 
+        val systemBars = SettingGroup("System Bars", listOf(
+            SettingItem.Reg(Settings.terminalSystemStatusBarVisible),
+            SettingItem.Reg(Settings.terminalStatusBarBehavior)
+        ))
+
         val keyBar = SettingGroup("Extra Keys", listOf(
             SettingItem.Reg(Settings.extraKeysEnabled),
             SettingItem.Reg(Settings.terminalExtraKeysHeight)
@@ -94,7 +99,7 @@ object SettingScreens {
             SettingItem.Reg(Settings.tmuxPrefixKey)
         ))
 
-        val appearanceGroups = listOf(typography, color, cursor, rendering)
+        val appearanceGroups = listOf(typography, color, cursor, rendering, systemBars)
         val inputGroups = listOf(keyBar, hardwareKeys, scrolling, gestures, tmux)
 
     }
