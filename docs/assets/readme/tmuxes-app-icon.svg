@@ -1,0 +1,8 @@
+<svg width="108" height="108" viewBox="0 0 108 108" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">tmuxes app icon</title>
+  <desc id="desc">The tmuxes Android launcher icon.</desc>
+  <rect width="108" height="108" fill="#17365F"/>
+  <g transform="translate(30 30) scale(2)">
+    <path d="M20 4H4C2.89 4 2 4.9 2 6v12c0 1.1 0.89 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.89-2-2-2zM20 18H4V8h16v10zM18 17h-6v-2h6v2zM7.5 17l-1.41-1.41L8.67 13l-2.59-2.59L7.5 9l4 4z" fill="#D6E3FF"/>
+  </g>
+</svg>

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/readme/tmuxes-mark.svg" alt="tmuxes" width="96">
+  <img src="docs/assets/readme/tmuxes-app-icon.svg" alt="tmuxes" width="96">
 </p>
 
 <h1 align="center">tmuxes</h1>
@@ -335,8 +335,8 @@ widgets, and an eventual iOS implementation are all meaningful directions.
 ## Contributing
 
 Welcome. If you care about terminal UX, remote development, self-hosting,
-mobile computing, SSH, tmux, Android, or developer tools, there is useful work
-to do here.
+mobile computing, SSH, tmux, Android, CLI-native vibe coding, or developer
+tools, there is useful work to do here.
 
 You do not need to understand the whole app to help. Good contributions are
 focused, reproducible, and easy to review: explain the problem, keep the
@@ -358,6 +358,15 @@ High-impact contribution areas:
   [psmux](https://github.com/psmux/psmux) as the Windows-side
   tmux-compatible layer, then adapt tmuxes for shells hosted there,
   especially PowerShell and cmd.exe.
+- **CLI-native vibe-coding workflows**: contributors who live in Codex CLI,
+  Claude Code, terminal editors, test runners, and project-specific scripts
+  can help shape examples, widgets, snippets, and workflow polish around that
+  real command-line loop.
+- **Widget-focused CLI and TUI apps**: tmuxes widgets can turn terminal output
+  into Android home-screen surfaces. We welcome tools designed for that space:
+  TUI performance monitors, IoT panels, visual service-status boards, task and
+  deployment progress views, queue dashboards, and other small command-line
+  apps that become useful at a glance.
 - **iOS platform work**: tmuxes is Android-only today. Contributors interested
   in bringing the same tmux-first terminal, widget, and forwarding ideas to
   iOS are welcome to explore a native iOS implementation that shares the

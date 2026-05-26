@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/readme/tmuxes-mark.svg" alt="tmuxes" width="96">
+  <img src="docs/assets/readme/tmuxes-app-icon.svg" alt="tmuxes" width="96">
 </p>
 
 <h1 align="center">tmuxes</h1>
@@ -326,8 +326,8 @@ tmuxes 现在已经能作为 Android SSH/tmux 终端使用。我们还在继续�
 
 ## 欢迎贡献
 
-如果你关心终端体验、远程开发、自托管、移动计算、SSH、tmux、Android 或开发者工具，
-这个项目里有很多值得做的事情。
+如果你关心终端体验、远程开发、自托管、移动计算、SSH、tmux、Android、
+vibe coding 或开发者工具，这个项目里有很多值得做的事情。
 
 不需要先读完整个代码库才开始。好的贡献应该聚焦、可复现、容易 review：
 把问题说清楚，改动控制住，除非 PR 明确说明，否则不要改变外部行为；风险较高的地方补测试，
@@ -342,6 +342,13 @@ tmuxes 现在已经能作为 Android SSH/tmux 终端使用。我们还在继续�
 - **Windows through psmux**：欢迎验证
   [psmux](https://github.com/psmux/psmux) 作为 Windows 侧 tmux-compatible layer，
   并在这个基础上适配 PowerShell、cmd.exe 等 shell。
+- **CLI-native vibe coding workflows**：欢迎长期使用 Codex CLI、Claude Code、
+  终端编辑器、测试工具、项目脚本的 vibe coding 开发者，一起把真实命令行循环里的
+  示例、widget、snippet 和工作流打磨好。
+- **面向桌面磁贴的 CLI/TUI 应用**：tmuxes 的 widget 可以把终端输出变成 Android
+  桌面上的实时表面。我们欢迎大家专门为这个场景开发小而有用的命令行应用：
+  TUI 性能监视器、物联网面板、可视化服务状态、任务和部署进度、队列看板，
+  以及其他一眼就能读懂的桌面终端工具。
 - **iOS platform work**：tmuxes 现在只有 Android。欢迎探索原生 iOS 版本，把同样的
   tmux-first terminal、widget、forwarding 思路带到 iOS。
 

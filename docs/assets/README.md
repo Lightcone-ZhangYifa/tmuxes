@@ -5,7 +5,8 @@ and project documentation.
 
 Tracked assets:
 
-- `readme/tmuxes-mark.svg`: project mark used in the README hero.
+- `readme/tmuxes-app-icon.svg`: README hero icon derived from the Android
+  launcher icon resources.
 - `readme/tmuxes-readme-screens.png`: horizontally stitched emulator
   screenshots for the README.
 - `readme/01-agent-widgets.png`: real tmuxes widgets attached to Claude Code
