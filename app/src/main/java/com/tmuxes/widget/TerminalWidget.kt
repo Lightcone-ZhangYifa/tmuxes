@@ -34,6 +34,9 @@ open class TerminalWidget : AppWidgetProvider() {
             TerminalWidgetLarge::class.java
         )
 
+        const val DEFAULT_WIDGET_FOREGROUND_OPACITY: Int = 100
+        const val DEFAULT_WIDGET_BACKGROUND_OPACITY: Int = 50
+
         // -----------------------------------------------------------------
         // Per-widget config data class
         // -----------------------------------------------------------------
@@ -48,7 +51,7 @@ open class TerminalWidget : AppWidgetProvider() {
             val serverId: Long = 0,
             val sessionName: String = "",
             // Widget-specific
-            val opacity: Int = 100,
+            val opacity: Int = DEFAULT_WIDGET_FOREGROUND_OPACITY,
             val showTitleBar: Boolean = true,
             val orientation: Int = 0,
             // Terminal appearance (independent per widget)
@@ -62,7 +65,7 @@ open class TerminalWidget : AppWidgetProvider() {
             val cursorBlink: Boolean = Settings.terminalCursorBlink.default,
             val cursorColor: Int = Settings.terminalCursorColor.default,
             val titleAccentColor: Int = 0x604FC3F7.toInt(),
-            val backgroundOpacity: Int = Settings.terminalBackgroundOpacity.default,
+            val backgroundOpacity: Int = DEFAULT_WIDGET_BACKGROUND_OPACITY,
             val boldIsBright: Boolean = Settings.terminalBoldIsBright.default,
             val underlineStyle: String = Settings.terminalUnderlineStyle.default,
             val lineSpacing: Int = Settings.terminalLineSpacing.default,

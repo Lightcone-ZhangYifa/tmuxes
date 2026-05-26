@@ -97,12 +97,12 @@ class I18nSourceAuditTest {
     }
 
     @Test
-    fun `app version and database are reset to first release`() {
+    fun `app version matches current release and database remains first schema`() {
         val gradle = projectFile("build.gradle.kts").readText()
         val db = projectFile("src/main/java/com/tmuxes/data/db/AppDatabase.kt").readText()
 
-        assertTrue(gradle.contains("versionCode = 1"))
-        assertTrue(gradle.contains("versionName = \"1.0.0\""))
+        assertTrue(gradle.contains("versionCode = 2"))
+        assertTrue(gradle.contains("versionName = \"1.0.1\""))
         assertTrue(db.contains("version = 1"))
         assertTrue(db.contains("\"tmuxes_database_v1\""))
         assertFalse(db.contains("add" + "Mig" + "rations"))

@@ -14,7 +14,7 @@ import com.tmuxes.util.ColorHex
  */
 object TerminalColors {
 
-    const val DEFAULT_SCHEME_NAME: String = "catppuccin_mocha"
+    const val DEFAULT_SCHEME_NAME: String = "dracula"
 
     // -- Default foreground / background (Catppuccin Mocha inspired) --
     const val DEFAULT_FG: Int = 0xFFCCCCCC.toInt()
@@ -223,7 +223,7 @@ object TerminalColors {
      * Resolves a color scheme by its lowercase key name.
      *
      * Recognized keys: "monokai", "solarized_dark", "dracula", "nord", "one_dark".
-     * Returns [CATPPUCCIN_MOCHA] for unrecognized names.
+     * Returns [DRACULA] for unrecognized names.
      */
     fun getSchemeByName(name: String): ColorScheme {
         return when (name.lowercase()) {
@@ -234,7 +234,7 @@ object TerminalColors {
             "one_dark", "onedark" -> ONE_DARK
             "catppuccin", "catppuccin_mocha" -> CATPPUCCIN_MOCHA
             "gruvbox", "gruvbox_dark" -> GRUVBOX_DARK
-            else -> CATPPUCCIN_MOCHA
+            else -> DRACULA
         }
     }
 

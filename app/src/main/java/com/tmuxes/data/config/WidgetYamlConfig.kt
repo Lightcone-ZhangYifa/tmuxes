@@ -4,6 +4,8 @@ import android.content.Context
 import com.tmuxes.data.settings.Settings
 import com.tmuxes.util.AppLogger
 import com.tmuxes.util.ColorHex
+import com.tmuxes.widget.TerminalWidget.Companion.DEFAULT_WIDGET_BACKGROUND_OPACITY
+import com.tmuxes.widget.TerminalWidget.Companion.DEFAULT_WIDGET_FOREGROUND_OPACITY
 import com.tmuxes.widget.TerminalWidget.Companion.WidgetConfig
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
@@ -168,7 +170,7 @@ class WidgetYamlConfig(private val context: Context) {
         return WidgetConfig(
             serverId = (session["server_id"] as? Number)?.toLong() ?: 0L,
             sessionName = (session["session_name"] as? String) ?: "",
-            opacity = (widget["opacity"] as? Number)?.toInt() ?: 100,
+            opacity = (widget["opacity"] as? Number)?.toInt() ?: DEFAULT_WIDGET_FOREGROUND_OPACITY,
             showTitleBar = (widget["show_title_bar"] as? Boolean) ?: true,
             orientation = (widget["orientation"] as? Number)?.toInt() ?: 0,
             titleAccentColor = ColorHex.parse(widget["title_accent_color"]) ?: 0x604FC3F7.toInt(),
@@ -179,7 +181,7 @@ class WidgetYamlConfig(private val context: Context) {
             cursorStyle = (terminal["cursor_style"] as? String) ?: Settings.terminalCursorStyle.default,
             cursorBlink = (terminal["cursor_blink"] as? Boolean) ?: Settings.terminalCursorBlink.default,
             cursorColor = ColorHex.parse(terminal["cursor_color"]) ?: Settings.terminalCursorColor.default,
-            backgroundOpacity = (terminal["background_opacity"] as? Number)?.toInt() ?: Settings.terminalBackgroundOpacity.default,
+            backgroundOpacity = (terminal["background_opacity"] as? Number)?.toInt() ?: DEFAULT_WIDGET_BACKGROUND_OPACITY,
             boldIsBright = (terminal["bold_is_bright"] as? Boolean) ?: Settings.terminalBoldIsBright.default,
             underlineStyle = (terminal["underline_style"] as? String) ?: Settings.terminalUnderlineStyle.default,
             lineSpacing = (terminal["line_spacing"] as? Number)?.toInt() ?: Settings.terminalLineSpacing.default,

@@ -536,7 +536,7 @@ object Settings {
 
     val terminalColorScheme = register(StringEnumSetting(
         key = gk("terminal", "color_scheme"),
-        default = "monokai",
+        default = "dracula",
         options = terminalColorSchemes,
         ui = SettingUi(title = "Color Scheme", iconId = "color_lens")
     ))

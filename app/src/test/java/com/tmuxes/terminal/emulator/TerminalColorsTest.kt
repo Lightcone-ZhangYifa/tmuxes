@@ -20,6 +20,12 @@ class TerminalColorsTest {
     @Test fun `round-trip Gruvbox Dark`() = assertRoundTrip(TerminalColors.GRUVBOX_DARK)
     @Test fun `round-trip One Dark`() = assertRoundTrip(TerminalColors.ONE_DARK)
 
+    @Test fun `default scheme is Dracula`() {
+        assertEquals("dracula", TerminalColors.DEFAULT_SCHEME_NAME)
+        assertEquals("Dracula", TerminalColors.getSchemeByName(TerminalColors.DEFAULT_SCHEME_NAME).name)
+        assertEquals("Dracula", TerminalColors.getSchemeByName("unknown").name)
+    }
+
     private fun assertRoundTrip(original: TerminalColors.ColorScheme) {
         val json = TerminalColors.toJson(original)
         val restored = TerminalColors.fromJson(json)

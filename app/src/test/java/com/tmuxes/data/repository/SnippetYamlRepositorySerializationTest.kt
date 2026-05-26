@@ -57,10 +57,29 @@ class SnippetYamlRepositorySerializationTest {
             "library count matches catalog",
             PresetSnippetCatalog.libraries.size, cfg.libraries.size
         )
-        // tmux library has 28 commands (13 base + 15 added in commit 917fd20)
-        val tmux = cfg.libraries.find { it.name == "tmux Sessions" }
+        assertEquals(
+            "preset library names",
+            listOf("Codex CLI", "Claude Code", "tmux", "SSH", "Git", "Docker", "Python", "Slurm", "APT", "Conda"),
+            cfg.libraries.map { it.name }
+        )
+        assertEquals(
+            "preset snippet counts",
+            mapOf(
+                "Codex CLI" to 11,
+                "Claude Code" to 11,
+                "tmux" to 15,
+                "SSH" to 17,
+                "Git" to 16,
+                "Docker" to 15,
+                "Python" to 14,
+                "Slurm" to 14,
+                "APT" to 13,
+                "Conda" to 12
+            ),
+            cfg.libraries.associate { it.name to it.snippets.size }
+        )
+        val tmux = cfg.libraries.find { it.name == "tmux" }
         assertNotNull("tmux library present", tmux)
-        assertEquals(28, tmux!!.snippets.size)
         // All preset libraries are opt-in by default.
         assertTrue("all preset libraries default disabled",
             cfg.libraries.all { !it.isEnabled })
@@ -72,7 +91,9 @@ class SnippetYamlRepositorySerializationTest {
         assertTrue("yaml file created", yamlFile.exists())
         val text = yamlFile.readText()
         assertTrue("yaml has libraries key", text.contains("libraries:"))
-        assertTrue("yaml has tmux library", text.contains("tmux Sessions"))
+        assertTrue("yaml has Codex library", text.contains("Codex CLI"))
+        assertTrue("yaml has SSH library", text.contains("SSH"))
+        assertTrue("yaml has Docker library", text.contains("Docker"))
     }
 
     // -----------------------------------------------------------------
@@ -121,7 +142,7 @@ class SnippetYamlRepositorySerializationTest {
     @Test
     fun `deleteLibrary cascades snippets`() = runBlocking {
         val repo = newRepo()
-        val tmux = repo.config.value.libraries.find { it.name == "tmux Sessions" }!!
+        val tmux = repo.config.value.libraries.find { it.name == "tmux" }!!
         val snippetCountBefore = tmux.snippets.size
         assertTrue("tmux had snippets", snippetCountBefore > 0)
 
@@ -168,10 +189,10 @@ class SnippetYamlRepositorySerializationTest {
         assertTrue("nothing enabled by default", initial.isEmpty())
 
         // Enable tmux library
-        val tmux = repo.config.value.libraries.find { it.name == "tmux Sessions" }!!
+        val tmux = repo.config.value.libraries.find { it.name == "tmux" }!!
         repo.updateLibrary(tmux.id) { copy(isEnabled = true) }
         val afterEnable = repo.enabledSnippets.first()
-        assertTrue("snippets visible now", afterEnable.size >= 28)
+        assertTrue("snippets visible now", afterEnable.size >= 15)
 
         // Disable one snippet → it disappears from enabled list
         val firstSnippet = afterEnable.first().snippet
@@ -236,7 +257,7 @@ class SnippetYamlRepositorySerializationTest {
     @Test
     fun `updateLibrary transform toggles isEnabled`() = runBlocking {
         val repo = newRepo()
-        val tmux = repo.config.value.libraries.find { it.name == "tmux Sessions" }!!
+        val tmux = repo.config.value.libraries.find { it.name == "tmux" }!!
         assertFalse("starts disabled", tmux.isEnabled)
         repo.updateLibrary(tmux.id) { copy(isEnabled = !isEnabled) }
         val tmux2 = repo.config.value.libraries.find { it.id == tmux.id }!!

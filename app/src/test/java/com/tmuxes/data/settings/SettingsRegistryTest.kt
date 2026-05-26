@@ -117,6 +117,11 @@ class SettingsRegistryTest {
     }
 
     @Test
+    fun `terminal color scheme defaults to dracula`() {
+        assertEquals("dracula", Settings.terminalColorScheme.default)
+    }
+
+    @Test
     fun `language setting options are sourced from app language catalog`() {
         val expected = AppLanguage.entries.map { it.settingValue to it.displayName }
         val actual = Settings.appLanguage.options.map { it.value to it.label }
