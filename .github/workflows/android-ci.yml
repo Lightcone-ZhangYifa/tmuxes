@@ -22,27 +22,26 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6
+        env:
+          REPOSITORY: ${{ github.repository }}
+          REF_SHA: ${{ github.sha }}
+        run: |
+          git init .
+          git remote add origin "https://github.com/$REPOSITORY.git"
+          git fetch --depth=1 origin "$REF_SHA"
+          git checkout --detach FETCH_HEAD
+          git config --global --add safe.directory "$PWD"
 
-      - name: Set up JDK
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: "17"
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6
+      - name: Select JDK 17
+        run: |
+          if [ -n "${JAVA_HOME_17_X64:-}" ]; then
+            echo "JAVA_HOME=$JAVA_HOME_17_X64" >> "$GITHUB_ENV"
+            echo "$JAVA_HOME_17_X64/bin" >> "$GITHUB_PATH"
+          fi
+          java -version
 
       - name: Verify Gradle wrapper
         run: ./gradlew --version
 
       - name: Compile, test, design rules, lint
         run: ./gradlew --no-daemon compileDebugKotlin testDebugUnitTest checkDesignRules lintDebug
-
-      - name: Upload lint report on failure
-        if: failure()
-        uses: actions/upload-artifact@v7
-        with:
-          name: lint-debug-report
-          path: app/build/reports/lint-results-debug.html
-          if-no-files-found: ignore

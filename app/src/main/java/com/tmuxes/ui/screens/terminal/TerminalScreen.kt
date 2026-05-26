@@ -14,8 +14,8 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,14 +47,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.automirrored.filled.Input
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -75,6 +73,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontFamily
@@ -535,10 +534,7 @@ fun TerminalScreen(
                         catch (_: Throwable) {}
                     },
                     onSaveToSnippet = { saveToSnippetCommand = it },
-                    onToggleFavorite = { libId, snipId -> snippetViewModel.toggleSnippetFavorited(libId, snipId) },
-                    onFetchRemoteClipboard = {
-                        try { sessionViewModel.fetchRemoteClipboard() } catch (_: Throwable) {}
-                    }
+                    onToggleFavorite = { libId, snipId -> snippetViewModel.toggleSnippetFavorited(libId, snipId) }
                 )
             }
         }
@@ -641,9 +637,8 @@ fun TerminalScreen(
  * clipboards (remote + phone), favorites, snippets (grouped by library),
  * and shell history.
  *
- * Multi-tap contract: every action callback (insert / run / save / toggle
- * favorite / etc.) does ONE thing — fires the action. The bubble stays
- * open. Closing is the user's job (tap scrim / press Back).
+ * Tap contract: rows insert on tap. Swipe actions are reserved for secondary
+ * item metadata, such as favorite or saving a history entry.
  */
 @Composable
 private fun CommandPanelBubbleContent(
@@ -661,115 +656,52 @@ private fun CommandPanelBubbleContent(
     onSetRemoteClipboard: (String) -> Unit,
     onCopyToPhoneClipboard: (String) -> Unit,
     onSaveToSnippet: (String) -> Unit,
-    onToggleFavorite: (libraryId: Long, snippetId: Long) -> Unit,
-    onFetchRemoteClipboard: () -> Unit
+    onToggleFavorite: (libraryId: Long, snippetId: Long) -> Unit
 ) {
     val tokens = MaterialTheme.appTokens
 
     AppLazyColumn(
         modifier = Modifier.fillMaxWidth(),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(tokens.space.md),
-        verticalArrangement = Arrangement.spacedBy(tokens.space.md)
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(
+            horizontal = tokens.space.md,
+            vertical = tokens.space.sm
+        ),
+        verticalArrangement = Arrangement.spacedBy(tokens.space.sm)
     ) {
         item {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = t("Command Panel"),
-                    style = tokens.type.titleMedium,
-                    color = tokens.colors.onSurface
-                )
-                Spacer(modifier = Modifier.width(tokens.space.sm))
-                if (isHistoryRefreshing) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(14.dp),
-                        strokeWidth = 2.dp,
-                        color = tokens.colors.primary
-                    )
-                } else {
-                    AppIconButton(
-                        icon = Icons.Filled.Refresh,
-                        onClick = onRefreshHistory,
-                        contentDescription = "Refresh history",
-                        role = AppIconRole.Primary
-                    )
-                }
-            }
-        }
-
-        item {
-            AppTextField(
-                value = commandSearch,
-                onValueChange = onSearchChange,
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = "Search snippets or history",
-                singleLine = true,
-                leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) }
+            CommandPanelHeader(
+                isHistoryRefreshing = isHistoryRefreshing,
+                onRefreshHistory = onRefreshHistory
             )
         }
 
-        // ---- Remote Clipboard ----
-        item { CommandPanelSectionHeader("Remote Clipboard") }
         item {
-            val rc = remoteClipboard
-            if (rc.isNullOrBlank()) {
-                Text(
-                    t("Remote clipboard empty"),
-                    color = tokens.colors.outline,
-                    style = tokens.type.bodySmall
-                )
-            } else {
-                CommandPanelClipboardCard(
-                    content = rc,
-                    onInsert = { onSendCommand(rc, false) },
-                    onRun = { onSendCommand(rc, true) },
-                    onSave = { onSaveToSnippet(rc) },
-                    onCopyToOther = { onCopyToPhoneClipboard(rc) },
-                    copyLabel = "→ Phone",
-                    onRefresh = onFetchRemoteClipboard
-                )
-            }
+            CommandPanelSearchField(
+                value = commandSearch,
+                onValueChange = onSearchChange,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
 
-        // ---- Swap button ----
-        if (!remoteClipboard.isNullOrBlank() && !phoneClipboard.isNullOrBlank()) {
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    AppButton(
-                        text = "⇄ Swap",
-                        onClick = {
-                            val oldRemote = remoteClipboard
-                            val oldPhone = phoneClipboard
-                            onCopyToPhoneClipboard(oldRemote)
-                            onSetRemoteClipboard(oldPhone)
-                        },
-                        style = AppButtonStyle.Text
-                    )
+        // ---- Clipboard ----
+        item { CommandPanelSectionHeader("Clipboard") }
+        item {
+            CommandPanelClipboardPair(
+                remoteClipboard = remoteClipboard,
+                phoneClipboard = phoneClipboard,
+                onInsertRemote = {
+                    val text = remoteClipboard
+                    if (!text.isNullOrBlank()) onSendCommand(text, false)
+                },
+                onInsertPhone = {
+                    val text = phoneClipboard
+                    if (!text.isNullOrBlank()) onSendCommand(text, false)
+                },
+                onSwap = { remoteBefore, phoneBefore ->
+                    onSetRemoteClipboard(phoneBefore)
+                    onCopyToPhoneClipboard(remoteBefore)
                 }
-            }
-        }
-
-        // ---- Phone Clipboard ----
-        item { CommandPanelSectionHeader("Phone Clipboard") }
-        item {
-            if (phoneClipboard.isNullOrBlank()) {
-                Text(
-                    t("Clipboard empty"),
-                    color = tokens.colors.outline,
-                    style = tokens.type.bodySmall
-                )
-            } else {
-                CommandPanelClipboardCard(
-                    content = phoneClipboard,
-                    onInsert = { onSendCommand(phoneClipboard, false) },
-                    onRun = { onSendCommand(phoneClipboard, true) },
-                    onSave = { onSaveToSnippet(phoneClipboard) },
-                    onCopyToOther = { onSetRemoteClipboard(phoneClipboard) },
-                    copyLabel = "→ Remote"
-                )
-            }
+            )
         }
 
         // ---- Favorites ----
@@ -777,11 +709,7 @@ private fun CommandPanelBubbleContent(
         val favoriteSnippets = filteredSnippets.filter { it.snippet.isFavorited }
         if (favoriteSnippets.isEmpty()) {
             item {
-                Text(
-                    t("No favorites yet"),
-                    color = tokens.colors.outline,
-                    style = tokens.type.bodySmall
-                )
+                CommandPanelEmptyText("No favorites yet")
             }
         } else {
             items(favoriteSnippets, key = { "fav_${it.snippet.id}" }) { es ->
@@ -790,7 +718,6 @@ private fun CommandPanelBubbleContent(
                     command = es.snippet.command,
                     isFavorited = true,
                     onInsert = { onSendCommand(es.snippet.command, false) },
-                    onRun = { onSendCommand(es.snippet.command, true) },
                     onToggleFavorite = { onToggleFavorite(es.library.id, es.snippet.id) }
                 )
             }
@@ -800,11 +727,7 @@ private fun CommandPanelBubbleContent(
         item { CommandPanelSectionHeader("Snippets") }
         if (filteredSnippets.isEmpty()) {
             item {
-                Text(
-                    text = t(if (commandSearch.isBlank()) "No snippets" else "No matching snippets"),
-                    color = tokens.colors.outline,
-                    style = tokens.type.bodyMedium
-                )
+                CommandPanelEmptyText(if (commandSearch.isBlank()) "No snippets" else "No matching snippets")
             }
         } else {
             val grouped = filteredSnippets.groupBy { it.library.id to it.library.name }
@@ -813,39 +736,13 @@ private fun CommandPanelBubbleContent(
                 val isExpanded = expandedLibraryId == libId
 
                 item(key = "lib_header_$libId") {
-                    AppCard(
-                        modifier = Modifier.fillMaxWidth(),
-                        variant = AppCardVariant.Filled,
+                    CommandPanelLibraryHeader(
+                        name = libName,
+                        count = libSnippets.size,
+                        isExpanded = isExpanded,
                         onClick = { onExpandLibrary(if (isExpanded) null else libId) },
-                        contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                            horizontal = tokens.space.md,
-                            vertical = tokens.space.sm
-                        )
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = libName,
-                                style = tokens.type.labelMedium,
-                                color = tokens.colors.primary
-                            )
-                            Spacer(modifier = Modifier.weight(1f))
-                            Text(
-                                text = "${libSnippets.size}",
-                                style = tokens.type.labelSmall,
-                                color = tokens.colors.outline
-                            )
-                            Spacer(modifier = Modifier.width(tokens.space.xs))
-                            Icon(
-                                imageVector = if (isExpanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
-                                contentDescription = t(if (isExpanded) "Collapse" else "Expand"),
-                                tint = tokens.colors.outline,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-                    }
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
 
                 if (isExpanded) {
@@ -855,7 +752,6 @@ private fun CommandPanelBubbleContent(
                             command = es.snippet.command,
                             isFavorited = es.snippet.isFavorited,
                             onInsert = { onSendCommand(es.snippet.command, false) },
-                            onRun = { onSendCommand(es.snippet.command, true) },
                             onToggleFavorite = { onToggleFavorite(es.library.id, es.snippet.id) }
                         )
                     }
@@ -867,35 +763,191 @@ private fun CommandPanelBubbleContent(
         item { CommandPanelSectionHeader("History") }
         if (filteredHistory.isEmpty()) {
             item {
-                Text(
-                    text = t(if (commandSearch.isBlank()) "No shell history yet" else "No matching history"),
-                    color = tokens.colors.outline,
-                    style = tokens.type.bodyMedium
-                )
+                CommandPanelEmptyText(if (commandSearch.isBlank()) "No shell history yet" else "No matching history")
             }
         } else {
             items(filteredHistory.reversed(), key = { it }) { command ->
                 CommandPanelHistoryRow(
                     command = command,
                     onInsert = { onSendCommand(command, false) },
-                    onRun = { onSendCommand(command, true) },
                     onSaveToSnippets = { onSaveToSnippet(command) }
                 )
             }
         }
 
-        item { Spacer(modifier = Modifier.height(tokens.space.md)) }
+        item { Spacer(modifier = Modifier.height(tokens.space.sm)) }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun CommandPanelHeader(
+    isHistoryRefreshing: Boolean,
+    onRefreshHistory: () -> Unit
+) {
+    val tokens = MaterialTheme.appTokens
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(30.dp)
+                .clip(CircleShape)
+                .background(tokens.colors.primaryContainer),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Code,
+                contentDescription = null,
+                tint = tokens.colors.onPrimaryContainer,
+                modifier = Modifier.size(17.dp)
+            )
+        }
+        Spacer(modifier = Modifier.width(tokens.space.sm))
+        Text(
+            text = t("Command Panel"),
+            style = tokens.type.titleMedium,
+            color = tokens.colors.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f)
+        )
+        if (isHistoryRefreshing) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(18.dp),
+                strokeWidth = 2.dp,
+                color = tokens.colors.primary
+            )
+        } else {
+            AppIconButton(
+                icon = Icons.Filled.Refresh,
+                onClick = onRefreshHistory,
+                contentDescription = "Refresh history",
+                role = AppIconRole.Primary
+            )
+        }
+    }
+}
+
+@Composable
+private fun CommandPanelSearchField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val tokens = MaterialTheme.appTokens
+    Row(
+        modifier = modifier
+            .height(38.dp)
+            .clip(tokens.shape.sm)
+            .background(tokens.colors.surface)
+            .border(1.dp, tokens.colors.outlineVariant, tokens.shape.sm)
+            .padding(horizontal = tokens.space.sm),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Search,
+            contentDescription = null,
+            tint = tokens.colors.outline,
+            modifier = Modifier.size(18.dp)
+        )
+        Spacer(modifier = Modifier.width(tokens.space.sm))
+        BasicTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier.weight(1f),
+            singleLine = true,
+            textStyle = tokens.type.bodySmall.copy(color = tokens.colors.onSurface),
+            cursorBrush = SolidColor(tokens.colors.primary),
+            decorationBox = { innerTextField ->
+                Box(contentAlignment = Alignment.CenterStart) {
+                    if (value.isEmpty()) {
+                        Text(
+                            text = t("Search snippets or history"),
+                            color = tokens.colors.outline,
+                            style = tokens.type.bodySmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    innerTextField()
+                }
+            }
+        )
+        if (value.isNotEmpty()) {
+            Spacer(modifier = Modifier.width(tokens.space.xs))
+            Icon(
+                imageVector = Icons.Filled.Close,
+                contentDescription = t("Clear search"),
+                tint = tokens.colors.outline,
+                modifier = Modifier
+                    .size(18.dp)
+                    .clickable { onValueChange("") }
+            )
+        }
+    }
+}
+
+@Composable
+private fun CommandPanelEmptyText(text: String) {
+    val tokens = MaterialTheme.appTokens
+    Text(
+        text = t(text),
+        color = tokens.colors.outline,
+        style = tokens.type.bodySmall,
+        modifier = Modifier.padding(horizontal = tokens.space.xs)
+    )
+}
+
+@Composable
+private fun CommandPanelLibraryHeader(
+    name: String,
+    count: Int,
+    isExpanded: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val tokens = MaterialTheme.appTokens
+    Row(
+        modifier = modifier
+            .height(38.dp)
+            .clip(tokens.shape.sm)
+            .background(tokens.colors.surfaceContainer)
+            .clickable(onClick = onClick)
+            .padding(horizontal = tokens.space.sm),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = name,
+            style = tokens.type.labelMedium,
+            color = tokens.colors.primary,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            text = count.toString(),
+            style = tokens.type.labelSmall,
+            color = tokens.colors.outline
+        )
+        Spacer(modifier = Modifier.width(tokens.space.xs))
+        Icon(
+            imageVector = if (isExpanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+            contentDescription = t(if (isExpanded) "Collapse" else "Expand"),
+            tint = tokens.colors.outline,
+            modifier = Modifier.size(18.dp)
+        )
+    }
+}
+
 @Composable
 private fun CommandPanelSnippetRow(
     name: String,
     command: String,
     isFavorited: Boolean = false,
     onInsert: () -> Unit,
-    onRun: () -> Unit,
     onToggleFavorite: () -> Unit = {}
 ) {
     val tokens = MaterialTheme.appTokens
@@ -907,26 +959,17 @@ private fun CommandPanelSnippetRow(
                 color = tokens.status.warning,
                 onClick = onToggleFavorite,
                 label = if (isFavorited) "Unfav" else "Fav"
-            ),
-            AppRowAction(
-                icon = Icons.AutoMirrored.Filled.Input,
-                color = tokens.status.connected,
-                onClick = onInsert,
-                label = "Insert"
-            ),
-            AppRowAction(
-                icon = Icons.Filled.PlayArrow,
-                color = tokens.status.info,
-                onClick = onRun,
-                label = "Run"
             )
         )
     ) {
         AppCard(
             modifier = Modifier.fillMaxWidth(),
-            onLongClick = onInsert,
+            onClick = onInsert,
             variant = AppCardVariant.Outlined,
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(tokens.space.md)
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                horizontal = tokens.space.md,
+                vertical = tokens.space.sm
+            )
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -972,55 +1015,90 @@ private fun CommandPanelSnippetRow(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun CommandPanelClipboardCard(
-    content: String,
-    onInsert: () -> Unit,
-    onRun: () -> Unit,
-    onSave: () -> Unit,
-    onCopyToOther: () -> Unit,
-    copyLabel: String,
-    onRefresh: (() -> Unit)? = null
+private fun CommandPanelClipboardPair(
+    remoteClipboard: String?,
+    phoneClipboard: String?,
+    onInsertRemote: () -> Unit,
+    onInsertPhone: () -> Unit,
+    onSwap: (remoteBefore: String, phoneBefore: String) -> Unit
 ) {
     val tokens = MaterialTheme.appTokens
-    AppRowSwipe(
+    val canSwap = !remoteClipboard.isNullOrBlank() && !phoneClipboard.isNullOrBlank()
+    AppCard(
         modifier = Modifier.fillMaxWidth(),
-        actions = buildList {
-            add(AppRowAction(
-                icon = Icons.Filled.ContentCopy,
-                color = tokens.status.info,
-                onClick = onCopyToOther,
-                label = copyLabel
-            ))
-            add(AppRowAction(
-                icon = Icons.AutoMirrored.Filled.Input,
-                color = tokens.status.connected,
-                onClick = onInsert,
-                label = "Insert"
-            ))
-            add(AppRowAction(
-                icon = Icons.Filled.PlayArrow,
-                color = tokens.status.info,
-                onClick = onRun,
-                label = "Run"
-            ))
-        }
+        variant = AppCardVariant.Outlined,
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(tokens.space.xs)
     ) {
-        AppCard(
+        Row(
             modifier = Modifier.fillMaxWidth(),
-            onLongClick = onInsert,
-            variant = AppCardVariant.Outlined,
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(tokens.space.md)
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = content,
-                color = tokens.colors.onSurface,
-                style = tokens.type.monoSmall,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis
+            CommandPanelClipboardPane(
+                label = "Remote",
+                content = remoteClipboard,
+                emptyText = "Remote clipboard empty",
+                onInsert = onInsertRemote,
+                modifier = Modifier.weight(1f)
+            )
+            AppIconButton(
+                icon = Icons.Filled.SwapHoriz,
+                onClick = {
+                    val remoteBefore = remoteClipboard
+                    val phoneBefore = phoneClipboard
+                    if (!remoteBefore.isNullOrBlank() && !phoneBefore.isNullOrBlank()) {
+                        onSwap(remoteBefore, phoneBefore)
+                    }
+                },
+                contentDescription = "Swap clipboards",
+                enabled = canSwap,
+                role = AppIconRole.Primary,
+                modifier = Modifier.padding(horizontal = tokens.space.xs)
+            )
+            CommandPanelClipboardPane(
+                label = "Phone",
+                content = phoneClipboard,
+                emptyText = "Clipboard empty",
+                onInsert = onInsertPhone,
+                modifier = Modifier.weight(1f)
             )
         }
+    }
+}
+
+@Composable
+private fun CommandPanelClipboardPane(
+    label: String,
+    content: String?,
+    emptyText: String,
+    onInsert: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val tokens = MaterialTheme.appTokens
+    val hasContent = !content.isNullOrBlank()
+    Column(
+        modifier = modifier
+            .height(88.dp)
+            .clip(tokens.shape.sm)
+            .background(tokens.colors.surfaceContainer)
+            .clickable(enabled = hasContent, onClick = onInsert)
+            .padding(tokens.space.sm),
+        verticalArrangement = Arrangement.spacedBy(tokens.space.xs)
+    ) {
+        Text(
+            text = t(label),
+            color = tokens.colors.primary,
+            style = tokens.type.labelSmall,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Text(
+            text = if (hasContent) content.orEmpty() else t(emptyText),
+            color = if (hasContent) tokens.colors.onSurface else tokens.colors.outline,
+            style = tokens.type.monoSmall,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
@@ -1144,12 +1222,10 @@ private fun SaveToSnippetDialog(
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CommandPanelHistoryRow(
     command: String,
     onInsert: () -> Unit,
-    onRun: () -> Unit,
     onSaveToSnippets: () -> Unit
 ) {
     val tokens = MaterialTheme.appTokens
@@ -1161,26 +1237,17 @@ private fun CommandPanelHistoryRow(
                 color = tokens.status.info,
                 onClick = onSaveToSnippets,
                 label = "Save"
-            ),
-            AppRowAction(
-                icon = Icons.AutoMirrored.Filled.Input,
-                color = tokens.status.connected,
-                onClick = onInsert,
-                label = "Insert"
-            ),
-            AppRowAction(
-                icon = Icons.Filled.PlayArrow,
-                color = tokens.status.info,
-                onClick = onRun,
-                label = "Run"
             )
         )
     ) {
         AppCard(
             modifier = Modifier.fillMaxWidth(),
-            onLongClick = onInsert,
+            onClick = onInsert,
             variant = AppCardVariant.Outlined,
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(tokens.space.md)
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                horizontal = tokens.space.md,
+                vertical = tokens.space.sm
+            )
         ) {
             Text(
                 text = command,
