@@ -18,6 +18,8 @@ Changelog. Versioning will follow SemVer once public binary releases begin.
 - Default terminal and widget terminal color scheme is now Dracula.
 - New widgets now use a 50% terminal background opacity while keeping overall
   widget foreground opacity at 100%.
+- CodeQL now uses a clean uncached analysis build, and Dependabot groups Gradle
+  wrapper updates with Android build-tool updates.
 
 ## [1.0.0] - 2026-05-19
 
