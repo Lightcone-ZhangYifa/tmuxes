@@ -43,7 +43,7 @@ jobs:
           languages: java-kotlin
 
       - name: Build for analysis
-        run: ./gradlew --no-daemon compileDebugKotlin compileDebugJavaWithJavac
+        run: ./gradlew --no-daemon --no-build-cache clean compileDebugKotlin compileDebugJavaWithJavac
 
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@v4
