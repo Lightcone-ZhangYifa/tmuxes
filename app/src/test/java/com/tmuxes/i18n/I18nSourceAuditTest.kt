@@ -28,7 +28,14 @@ class I18nSourceAuditTest {
             "Failed to add server: {error}",
             "Failed to create session: {error}",
             "Snippet duplicated",
-            "Modified (Auto-saving)"
+            "Modified (Auto-saving)",
+            "System Bars",
+            "System Status Bar",
+            "Show the Android status bar while the terminal is open",
+            "Status Bar Area",
+            "How the terminal uses the top status bar and camera cutout area",
+            "Reserve safe area",
+            "Draw behind status bar"
         )
 
         messages.forEach { message ->
