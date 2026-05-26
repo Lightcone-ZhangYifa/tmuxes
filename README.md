@@ -5,6 +5,12 @@
 <h1 align="center">tmuxes</h1>
 
 <p align="center">
+  <a href="README.zh-CN.md">简体中文</a>
+  ·
+  <strong>English</strong>
+</p>
+
+<p align="center">
   <strong>We are building the best terminal experience mobile can offer.</strong>
 </p>
 
