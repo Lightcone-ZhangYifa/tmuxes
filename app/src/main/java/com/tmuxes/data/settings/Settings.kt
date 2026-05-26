@@ -83,6 +83,11 @@ object Settings {
         EnumOption("dashed", "Dashed")
     )
 
+    private val terminalStatusBarBehaviorOptions = listOf(
+        EnumOption("reserve", "Reserve safe area"),
+        EnumOption("draw_behind", "Draw behind status bar")
+    )
+
     private val statusBarStyleOptions = listOf(
         EnumOption("auto", "Auto (follow theme)"),
         EnumOption("surface", "Surface tinted"),
@@ -581,6 +586,27 @@ object Settings {
         default = 100,
         range = 0..100,
         ui = SettingUi(title = "Background Opacity", unit = "%", iconId = "opacity")
+    ))
+
+    val terminalSystemStatusBarVisible = register(BooleanSetting(
+        key = gk("terminal", "status_bar_visible"),
+        default = true,
+        ui = SettingUi(
+            title = "System Status Bar",
+            description = "Show the Android status bar while the terminal is open",
+            iconId = "visibility"
+        )
+    ))
+
+    val terminalStatusBarBehavior = register(StringEnumSetting(
+        key = gk("terminal", "status_bar_behavior"),
+        default = "reserve",
+        options = terminalStatusBarBehaviorOptions,
+        ui = SettingUi(
+            title = "Status Bar Area",
+            description = "How the terminal uses the top status bar and camera cutout area",
+            iconId = "phone_android"
+        )
     ))
 
     val terminalBoldIsBright = register(BooleanSetting(

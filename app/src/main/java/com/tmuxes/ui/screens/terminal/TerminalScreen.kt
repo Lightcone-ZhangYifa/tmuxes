@@ -21,16 +21,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import com.tmuxes.ui.components.app.AppLazyColumn
 import com.tmuxes.ui.components.app.AppLazyRow
 import androidx.compose.foundation.lazy.items
@@ -192,6 +189,10 @@ fun TerminalScreen(
     val autoScrollOutput by prefs.flow(Settings.autoScrollOutput).collectAsState(initial = Settings.autoScrollOutput.default)
     val scrollOnKeystroke by prefs.flow(Settings.scrollOnKeystroke).collectAsState(initial = Settings.scrollOnKeystroke.default)
     val volumeKeysAction by prefs.flow(Settings.volumeKeysAction).collectAsState(initial = Settings.volumeKeysAction.default)
+    val terminalSystemStatusBarVisible by prefs.flow(Settings.terminalSystemStatusBarVisible)
+        .collectAsState(initial = Settings.terminalSystemStatusBarVisible.default)
+    val terminalStatusBarBehavior by prefs.flow(Settings.terminalStatusBarBehavior)
+        .collectAsState(initial = Settings.terminalStatusBarBehavior.default)
     val bellRingCount by sessionViewModel.bellRingCount.collectAsState()
 
     val scope = rememberCoroutineScope()
@@ -301,6 +302,10 @@ fun TerminalScreen(
     // Keep screen on (respects user setting)
     val keepScreenOn by prefs.flow(Settings.keepScreenOn).collectAsState(initial = Settings.keepScreenOn.default)
     val view = LocalView.current
+    TerminalSystemStatusBarEffect(
+        showStatusBar = terminalSystemStatusBarVisible,
+        view = view
+    )
     DisposableEffect(keepScreenOn) {
         val window = (view.context as? android.app.Activity)?.window
         try {
@@ -362,6 +367,7 @@ fun TerminalScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(termBgColor)
+            .terminalStatusBarAreaPadding(terminalStatusBarBehavior)
             .imePadding()
     ) {
         // Minimal tab strip — only shown when multiple sessions are active
@@ -1411,7 +1417,6 @@ private fun MinimalTabStrip(
         modifier = Modifier
             .fillMaxWidth()
             .background(tokens.colors.surfaceContainer)
-            .windowInsetsPadding(WindowInsets.statusBars)
             .padding(horizontal = tokens.space.sm, vertical = tokens.space.xs),
         horizontalArrangement = Arrangement.spacedBy(tokens.space.xxs)
     ) {

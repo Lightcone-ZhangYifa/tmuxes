@@ -49,7 +49,8 @@ class SettingsRegistryTest {
             "terminal.extra_keys_height",
             "terminal.font_family", "terminal.font_size", "terminal.font_weight",
             "terminal.line_spacing", "terminal.padding", "terminal.scrollback_lines",
-            "terminal.selection_color", "terminal.tmux_prefix_key",
+            "terminal.selection_color", "terminal.status_bar_behavior",
+            "terminal.status_bar_visible", "terminal.tmux_prefix_key",
             "terminal.underline_style", "terminal.volume_keys"
         )
         val actual = Settings.all.map { it.key.flatPath }.toSet()
@@ -136,5 +137,16 @@ class SettingsRegistryTest {
             .map { item -> item.setting.key.flatPath }
 
         assertTrue(paths.contains(Settings.appLanguage.key.flatPath))
+    }
+
+    @Test
+    fun `terminal appearance screen exposes status bar settings`() {
+        val paths = SettingScreens.terminalAppearance.groups
+            .flatMap { group -> group.items }
+            .filterIsInstance<SettingItem.Reg>()
+            .map { item -> item.setting.key.flatPath }
+
+        assertTrue(paths.contains(Settings.terminalSystemStatusBarVisible.key.flatPath))
+        assertTrue(paths.contains(Settings.terminalStatusBarBehavior.key.flatPath))
     }
 }
