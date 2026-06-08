@@ -127,7 +127,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.9.8")
 
     // Core
-    implementation("androidx.core:core-ktx:1.18.0")
+    implementation("androidx.core:core-ktx:1.19.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
     implementation("androidx.lifecycle:lifecycle-process:2.10.0")
 
