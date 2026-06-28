@@ -1,0 +1,1339 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>tmuxes — Android SSH/tmux terminal control plane</title>
+  <meta name="description" content="tmuxes is a terminal-first Android app for durable SSH/tmux workspaces, programmable launcher widgets, SSH forwarding, and CLI-native development.">
+  <meta name="theme-color" content="#17365F">
+  <meta property="og:title" content="tmuxes — terminal workspaces that survive the phone">
+  <meta property="og:description" content="Durable SSH/tmux sessions, programmable Android widgets, private forwarding, parent-child server topology, and CLI-native coding from mobile.">
+  <meta property="og:image" content="https://lightcone-zhangyifa.github.io/tmuxes/assets/readme/tmuxes-readme-screens.png">
+  <meta property="og:type" content="website">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07101c;
+      --bg-2: #09192d;
+      --panel: rgba(12, 25, 42, .72);
+      --panel-strong: rgba(13, 31, 55, .9);
+      --line: rgba(191, 219, 254, .18);
+      --line-strong: rgba(147, 197, 253, .35);
+      --ink: #f8fbff;
+      --muted: #b8c7d9;
+      --dim: #7891ad;
+      --blue: #67a7ff;
+      --cyan: #76f4ff;
+      --green: #8ef0b2;
+      --violet: #b994ff;
+      --amber: #ffd27a;
+      --rose: #ff8faf;
+      --shadow: 0 24px 90px rgba(0, 0, 0, .45);
+      --radius-xl: 34px;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.58;
+      background:
+        radial-gradient(circle at 12% -8%, rgba(118, 244, 255, .2), transparent 28rem),
+        radial-gradient(circle at 88% 6%, rgba(103, 167, 255, .24), transparent 30rem),
+        radial-gradient(circle at 50% 58%, rgba(185, 148, 255, .14), transparent 36rem),
+        linear-gradient(180deg, #06101d 0%, #081527 42%, #050b14 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -2;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, .035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .035) 1px, transparent 1px);
+      background-size: 52px 52px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.72), transparent 70%);
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      opacity: .38;
+      background:
+        linear-gradient(120deg, transparent 0 45%, rgba(118,244,255,.08) 48%, transparent 52% 100%),
+        radial-gradient(circle at 75% 85%, rgba(103, 167, 255, .18), transparent 24rem);
+      filter: blur(.2px);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    code, pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    .en { display: none; }
+    body[data-lang="en"] .zh { display: none; }
+    body[data-lang="en"] .en { display: inline; }
+    body[data-lang="en"] .en.block { display: block; }
+    body[data-lang="zh"] .zh.block { display: block; }
+    body[data-lang="zh"] .en.block { display: none; }
+
+    .wrap {
+      width: min(var(--max), calc(100% - 36px));
+      margin: 0 auto;
+    }
+
+    .skip {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 1000;
+      transform: translateY(-140%);
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: var(--ink);
+      color: #06101d;
+      transition: transform .2s ease;
+    }
+
+    .skip:focus { transform: translateY(0); }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid rgba(191, 219, 254, .12);
+      background: rgba(4, 10, 18, .66);
+      backdrop-filter: blur(18px);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 74px;
+      gap: 18px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 850;
+      letter-spacing: -.03em;
+    }
+
+    .brand img {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      box-shadow: 0 8px 28px rgba(103, 167, 255, .22);
+    }
+
+    .brand span {
+      font-size: 1.06rem;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: .94rem;
+    }
+
+    .nav-links a,
+    .lang button {
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 9px 12px;
+      color: var(--muted);
+      background: transparent;
+      transition: border-color .2s ease, color .2s ease, background .2s ease;
+    }
+
+    .nav-links a:hover,
+    .lang button:hover,
+    .lang button[aria-pressed="true"] {
+      color: var(--ink);
+      border-color: rgba(147, 197, 253, .28);
+      background: rgba(147, 197, 253, .09);
+    }
+
+    .lang {
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid rgba(147, 197, 253, .18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .04);
+    }
+
+    .lang button {
+      cursor: pointer;
+      font: inherit;
+      padding: 7px 10px;
+    }
+
+    .hero {
+      position: relative;
+      padding: 74px 0 54px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(340px, .95fr);
+      gap: 38px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding: 8px 12px;
+      border: 1px solid rgba(118, 244, 255, .25);
+      border-radius: 999px;
+      color: #d9fbff;
+      background: rgba(118, 244, 255, .07);
+      box-shadow: inset 0 0 22px rgba(118, 244, 255, .05);
+      font-weight: 700;
+      font-size: .93rem;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 20px var(--green);
+    }
+
+    h1, h2, h3, p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 930px;
+      margin-bottom: 22px;
+      font-size: clamp(3.1rem, 8vw, 7.6rem);
+      line-height: .86;
+      letter-spacing: -.08em;
+    }
+
+    .gradient-text {
+      background: linear-gradient(110deg, #ffffff 0%, #d9ecff 32%, #76f4ff 57%, #9fbfff 78%, #ffffff 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .lead {
+      max-width: 720px;
+      color: var(--muted);
+      font-size: clamp(1.1rem, 2.2vw, 1.42rem);
+      line-height: 1.7;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 13px;
+      margin-top: 30px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 13px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(147, 197, 253, .25);
+      color: var(--ink);
+      font-weight: 800;
+      letter-spacing: -.01em;
+      background: rgba(255, 255, 255, .06);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08);
+      transition: transform .2s ease, border-color .2s ease, background .2s ease;
+    }
+
+    .btn.primary {
+      border-color: rgba(118, 244, 255, .48);
+      color: #04111c;
+      background: linear-gradient(135deg, #76f4ff, #8ef0b2 55%, #ffd27a);
+      box-shadow: 0 16px 42px rgba(118, 244, 255, .18);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      border-color: rgba(118, 244, 255, .5);
+      background: rgba(255, 255, 255, .09);
+    }
+
+    .btn.primary:hover {
+      background: linear-gradient(135deg, #8dffff, #9dffc2 55%, #ffe09b);
+    }
+
+    .hero-notes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 28px;
+      color: var(--dim);
+      font-size: .92rem;
+    }
+
+    .pill {
+      border: 1px solid rgba(147, 197, 253, .16);
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: rgba(255, 255, 255, .035);
+    }
+
+    .terminal-card {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(147, 197, 253, .2);
+      border-radius: var(--radius-xl);
+      background:
+        linear-gradient(180deg, rgba(17, 40, 68, .86), rgba(6, 14, 26, .88)),
+        radial-gradient(circle at top left, rgba(118, 244, 255, .12), transparent 20rem);
+      box-shadow: var(--shadow);
+    }
+
+    .terminal-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.09), transparent);
+      transform: translateX(-120%);
+      animation: shine 8s ease-in-out infinite;
+    }
+
+    .terminal-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 17px;
+      border-bottom: 1px solid rgba(147, 197, 253, .15);
+      background: rgba(255, 255, 255, .04);
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    .lights {
+      display: flex;
+      gap: 7px;
+    }
+
+    .lights i {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: block;
+      background: var(--line-strong);
+    }
+
+    .lights i:nth-child(1) { background: var(--rose); }
+    .lights i:nth-child(2) { background: var(--amber); }
+    .lights i:nth-child(3) { background: var(--green); }
+
+    .terminal-body {
+      padding: 21px;
+    }
+
+    .terminal-title {
+      margin-bottom: 16px;
+      color: var(--cyan);
+      font-size: .92rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .term-line {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 10px;
+      margin: 9px 0;
+      color: #d7e9ff;
+      font-size: clamp(.86rem, 1.5vw, 1rem);
+      line-height: 1.7;
+    }
+
+    .prompt { color: var(--green); }
+    .muted { color: var(--dim); }
+    .cyan { color: var(--cyan); }
+    .violet { color: var(--violet); }
+    .amber { color: var(--amber); }
+
+    .mini-dashboard {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .metric {
+      border: 1px solid rgba(147, 197, 253, .15);
+      border-radius: 18px;
+      padding: 14px;
+      background: rgba(255, 255, 255, .045);
+    }
+
+    .metric b {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--ink);
+      font-size: 1.16rem;
+      letter-spacing: -.03em;
+    }
+
+    .metric span {
+      color: var(--dim);
+      font-size: .84rem;
+    }
+
+    .section {
+      padding: 78px 0;
+    }
+
+    .section.tight { padding-top: 34px; }
+
+    .section-head {
+      max-width: 780px;
+      margin-bottom: 32px;
+    }
+
+    .kicker {
+      display: inline-block;
+      margin-bottom: 12px;
+      color: var(--cyan);
+      font-size: .84rem;
+      font-weight: 900;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin-bottom: 14px;
+      font-size: clamp(2.1rem, 5vw, 4.3rem);
+      line-height: .98;
+      letter-spacing: -.06em;
+    }
+
+    .section-head p,
+    .copy {
+      color: var(--muted);
+      font-size: 1.08rem;
+    }
+
+    .showcase {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(147, 197, 253, .18);
+      border-radius: var(--radius-xl);
+      padding: clamp(14px, 3vw, 26px);
+      background:
+        linear-gradient(145deg, rgba(12, 25, 42, .86), rgba(8, 18, 32, .64)),
+        radial-gradient(circle at 15% 15%, rgba(118, 244, 255, .14), transparent 26rem);
+      box-shadow: var(--shadow);
+    }
+
+    .showcase img {
+      width: 100%;
+      border-radius: calc(var(--radius-xl) - 12px);
+      border: 1px solid rgba(255, 255, 255, .08);
+      box-shadow: 0 18px 70px rgba(0, 0, 0, .36);
+    }
+
+    .caption {
+      margin: 14px 6px 0;
+      color: var(--dim);
+      font-size: .95rem;
+      text-align: center;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      position: relative;
+      overflow: hidden;
+      min-height: 230px;
+      border: 1px solid rgba(147, 197, 253, .16);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      background: rgba(255, 255, 255, .045);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      right: -90px;
+      bottom: -90px;
+      border-radius: 50%;
+      background: rgba(118, 244, 255, .11);
+      filter: blur(4px);
+    }
+
+    .card .icon {
+      display: inline-grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      margin-bottom: 18px;
+      border-radius: 14px;
+      color: #04111c;
+      background: linear-gradient(135deg, var(--cyan), var(--green));
+      font-size: 1.26rem;
+      font-weight: 900;
+    }
+
+    .card h3 {
+      margin-bottom: 10px;
+      font-size: 1.18rem;
+      line-height: 1.22;
+      letter-spacing: -.035em;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .96rem;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .panel {
+      border: 1px solid rgba(147, 197, 253, .16);
+      border-radius: var(--radius-xl);
+      padding: clamp(22px, 4vw, 34px);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .code-panel {
+      overflow: hidden;
+      padding: 0;
+      background: rgba(3, 8, 14, .82);
+    }
+
+    .code-panel pre {
+      margin: 0;
+      padding: 26px;
+      overflow-x: auto;
+      color: #d7e9ff;
+      line-height: 1.75;
+      font-size: .93rem;
+    }
+
+    .code-panel .bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(147, 197, 253, .16);
+      color: var(--dim);
+      background: rgba(255, 255, 255, .04);
+    }
+
+    .diagram {
+      position: relative;
+      min-height: 430px;
+      overflow: hidden;
+    }
+
+    .node {
+      position: absolute;
+      width: min(220px, 44%);
+      border: 1px solid rgba(147, 197, 253, .2);
+      border-radius: 20px;
+      padding: 15px;
+      background: rgba(255, 255, 255, .055);
+      box-shadow: 0 14px 44px rgba(0, 0, 0, .25);
+    }
+
+    .node strong {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--ink);
+      font-size: .98rem;
+    }
+
+    .node span {
+      color: var(--dim);
+      font-size: .84rem;
+    }
+
+    .node.phone { left: 4%; top: 8%; }
+    .node.bastion { right: 7%; top: 26%; }
+    .node.internal { left: 18%; bottom: 13%; }
+    .node.preview { right: 10%; bottom: 7%; }
+
+    .path {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .path svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .path path {
+      fill: none;
+      stroke: rgba(118, 244, 255, .56);
+      stroke-width: 2.5;
+      stroke-dasharray: 7 9;
+      animation: dash 18s linear infinite;
+    }
+
+    .compare {
+      overflow: hidden;
+      border: 1px solid rgba(147, 197, 253, .16);
+      border-radius: var(--radius-xl);
+      background: rgba(255, 255, 255, .04);
+      box-shadow: var(--shadow);
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .compare-col {
+      padding: clamp(22px, 4vw, 34px);
+    }
+
+    .compare-col:first-child {
+      border-right: 1px solid rgba(147, 197, 253, .14);
+      background: rgba(255, 255, 255, .025);
+    }
+
+    .compare h3 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      font-size: 1.32rem;
+    }
+
+    .compare ul {
+      display: grid;
+      gap: 13px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      color: var(--muted);
+    }
+
+    .compare li {
+      position: relative;
+      padding-left: 24px;
+    }
+
+    .compare li::before {
+      content: "×";
+      position: absolute;
+      left: 0;
+      color: var(--rose);
+      font-weight: 900;
+    }
+
+    .compare-col:last-child li::before {
+      content: "✓";
+      color: var(--green);
+    }
+
+    .tiles {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .tile {
+      border: 1px solid rgba(147, 197, 253, .16);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      background: rgba(255, 255, 255, .04);
+    }
+
+    .tile h3 {
+      margin-bottom: 8px;
+      font-size: 1.18rem;
+    }
+
+    .tile p {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .cta {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(118, 244, 255, .28);
+      border-radius: 42px;
+      padding: clamp(34px, 6vw, 62px);
+      background:
+        linear-gradient(135deg, rgba(23, 54, 95, .9), rgba(6, 14, 26, .88)),
+        radial-gradient(circle at 80% 20%, rgba(118, 244, 255, .2), transparent 24rem);
+      box-shadow: var(--shadow);
+    }
+
+    .cta::before {
+      content: "";
+      position: absolute;
+      inset: auto -12% -58% auto;
+      width: 540px;
+      height: 540px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(142, 240, 178, .24), transparent 70%);
+    }
+
+    .cta-content {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 24px;
+    }
+
+    .cta h2 {
+      max-width: 780px;
+      margin-bottom: 0;
+    }
+
+    footer {
+      padding: 42px 0 62px;
+      color: var(--dim);
+      font-size: .95rem;
+    }
+
+    footer .wrap {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+      border-top: 1px solid rgba(147, 197, 253, .14);
+      padding-top: 24px;
+    }
+
+    @keyframes shine {
+      0%, 54% { transform: translateX(-130%); opacity: 0; }
+      64% { opacity: .9; }
+      78%, 100% { transform: translateX(130%); opacity: 0; }
+    }
+
+    @keyframes dash {
+      to { stroke-dashoffset: -240; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition: none !important;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .split,
+      .cta-content {
+        grid-template-columns: 1fr;
+      }
+
+      .cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .nav-links a {
+        display: none;
+      }
+
+      h1 {
+        font-size: clamp(3rem, 13vw, 6rem);
+      }
+    }
+
+    @media (max-width: 660px) {
+      .wrap {
+        width: min(100% - 24px, var(--max));
+      }
+
+      .hero {
+        padding-top: 46px;
+      }
+
+      .nav-inner {
+        min-height: 66px;
+      }
+
+      .brand span {
+        display: none;
+      }
+
+      .cards,
+      .tiles,
+      .compare-grid,
+      .mini-dashboard {
+        grid-template-columns: 1fr;
+      }
+
+      .compare-col:first-child {
+        border-right: 0;
+        border-bottom: 1px solid rgba(147, 197, 253, .14);
+      }
+
+      .diagram {
+        min-height: 520px;
+      }
+
+      .node {
+        position: relative;
+        inset: auto !important;
+        width: 100%;
+        margin-bottom: 14px;
+      }
+
+      .path { display: none; }
+
+      .actions .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body data-lang="zh">
+  <a class="skip" href="#main">
+    <span class="zh">跳到正文</span><span class="en">Skip to content</span>
+  </a>
+
+  <header class="nav" aria-label="Primary navigation">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#top" aria-label="tmuxes home">
+        <img src="assets/readme/tmuxes-app-icon.svg" alt="">
+        <span>tmuxes</span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#model"><span class="zh">模型</span><span class="en">Model</span></a>
+        <a href="#widgets"><span class="zh">桌面磁贴</span><span class="en">Widgets</span></a>
+        <a href="#topology"><span class="zh">拓扑</span><span class="en">Topology</span></a>
+        <a href="#download"><span class="zh">下载</span><span class="en">Download</span></a>
+        <div class="lang" aria-label="Language">
+          <button type="button" data-set-lang="zh" aria-pressed="true">中</button>
+          <button type="button" data-set-lang="en" aria-pressed="false">EN</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow">
+            <span class="zh">Android 上的 SSH/tmux 控制面板</span>
+            <span class="en">SSH/tmux control plane for Android</span>
+          </div>
+
+          <h1>
+            <span class="zh gradient-text">让手机接管远程工作现场。</span>
+            <span class="en gradient-text">Terminal workspaces that survive the phone.</span>
+          </h1>
+
+          <p class="lead">
+            <span class="zh">tmuxes 不是另一个应急 SSH 客户端。它把 Android 变成远程机器的长期控制面板：tmux session 留在服务器，CLI 工具保持原生，桌面磁贴显示实时终端，SSH 转发和父子服务器拓扑都在同一个可信工作区里。</span>
+            <span class="en">tmuxes is not another emergency SSH client. It turns Android into a durable control panel for remote machines: tmux sessions live on the server, CLI tools stay native, launcher widgets render real terminal output, and forwarding plus parent-child server topology share one trusted workspace.</span>
+          </p>
+
+          <div class="actions">
+            <a class="btn primary" href="https://github.com/Lightcone-ZhangYifa/tmuxes/releases/latest">
+              <span class="zh">下载 signed APK</span><span class="en">Download signed APK</span>
+            </a>
+            <a class="btn" href="https://github.com/Lightcone-ZhangYifa/tmuxes">
+              <span class="zh">查看 GitHub 仓库</span><span class="en">View on GitHub</span>
+            </a>
+            <a class="btn" href="https://github.com/Lightcone-ZhangYifa/tmuxes/tree/main/docs">
+              <span class="zh">阅读文档</span><span class="en">Read docs</span>
+            </a>
+          </div>
+
+          <div class="hero-notes" aria-label="Highlights">
+            <span class="pill">tmux-first</span>
+            <span class="pill">SSH forwarding</span>
+            <span class="pill">
+              <span class="zh">可编程 Widgets</span><span class="en">Programmable widgets</span>
+            </span>
+            <span class="pill">
+              <span class="zh">CLI-native coding</span><span class="en">CLI-native coding</span>
+            </span>
+          </div>
+        </div>
+
+        <aside class="terminal-card" aria-label="Live terminal style product demo">
+          <div class="terminal-top">
+            <div class="lights" aria-hidden="true"><i></i><i></i><i></i></div>
+            <span>tmuxes://workspace/mobile-control</span>
+          </div>
+          <div class="terminal-body">
+            <div class="terminal-title">
+              <span class="zh">正在运行的远程工作区</span>
+              <span class="en">Remote workspace online</span>
+            </div>
+            <div id="terminal-lines" aria-live="polite"></div>
+
+            <div class="mini-dashboard">
+              <div class="metric">
+                <b>tmux</b>
+                <span class="zh">session 是骨架</span><span class="en">session as model</span>
+              </div>
+              <div class="metric">
+                <b>CLI</b>
+                <span class="zh">工具保持原样</span><span class="en">tools stay native</span>
+              </div>
+              <div class="metric">
+                <b>Widget</b>
+                <span class="zh">桌面就是状态面板</span><span class="en">launcher as dashboard</span>
+              </div>
+              <div class="metric">
+                <b>SSH</b>
+                <span class="zh">转发与拓扑内置</span><span class="en">tunnels built in</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section tight" aria-label="Product screenshots">
+      <div class="wrap showcase">
+        <img src="assets/readme/tmuxes-readme-screens.png" alt="tmuxes Android screenshots showing coding-agent widgets, a full-screen htop widget, SSH local forwarding, and parent-child server topology">
+        <p class="caption">
+          <span class="zh">真实 Claude Code 与 Codex 桌面磁贴、全屏 htop、能看到结果的 SSH Forwarding、父子服务器拓扑。</span>
+          <span class="en">Real Claude Code and Codex widgets, full-screen htop, working SSH forwarding, and parent-child server topology.</span>
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="model">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="kicker">
+            <span class="zh">核心模型</span><span class="en">Core model</span>
+          </span>
+          <h2>
+            <span class="zh">不是“手机里开了个终端”，而是把远程现场带到手机上。</span>
+            <span class="en">Not a terminal trapped on a phone. A remote workspace carried by one.</span>
+          </h2>
+          <p>
+            <span class="zh">tmuxes 的设计重心不是功能堆叠，而是一个连续的工作模型：远端负责持久性，Android 负责可见性、输入和控制。</span>
+            <span class="en">tmuxes is designed around one continuous model: the remote machine owns durability, while Android owns visibility, input, and control.</span>
+          </p>
+        </div>
+
+        <div class="cards">
+          <article class="card">
+            <div class="icon">01</div>
+            <h3><span class="zh">tmux 是骨架</span><span class="en">tmux owns continuity</span></h3>
+            <p><span class="zh">Shell、编辑器、日志和构建任务留在服务器。手机、平板、桌面 attach 同一个 session。</span><span class="en">Shells, editors, logs, and builds live on the server. Phone, tablet, and desktop attach to the same session.</span></p>
+          </article>
+
+          <article class="card">
+            <div class="icon">02</div>
+            <h3><span class="zh">桌面磁贴来自 CLI</span><span class="en">Widgets come from CLI</span></h3>
+            <p><span class="zh">不是固定卡片，而是实时终端表面。脚本、watch、TUI、agent 状态都能成为 Android 桌面的一部分。</span><span class="en">Not fixed cards, but live terminal surfaces. Scripts, watch commands, TUIs, and agent status can live on the launcher.</span></p>
+          </article>
+
+          <article class="card">
+            <div class="icon">03</div>
+            <h3><span class="zh">私有端口跟着 SSH</span><span class="en">Private ports follow SSH</span></h3>
+            <p><span class="zh">Local/remote forwarding 与终端共享同一台服务器、host key 信任和连接状态。</span><span class="en">Local and remote forwarding share the same server, host-key trust, and connection state as the terminal.</span></p>
+          </article>
+
+          <article class="card">
+            <div class="icon">04</div>
+            <h3><span class="zh">拓扑可见</span><span class="en">Topology is visible</span></h3>
+            <p><span class="zh">堡垒机、内网、父子服务器不是一串扁平主机名，而是能理解、能重排、能恢复的关系。</span><span class="en">Bastions, private networks, and child servers are not flattened into names; they are visible, reorderable relationships.</span></p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="widgets">
+      <div class="wrap split">
+        <div class="panel">
+          <span class="kicker">
+            <span class="zh">桌面磁贴</span><span class="en">Launcher widgets</span>
+          </span>
+          <h2>
+            <span class="zh">把 Android 桌面变成 session board。</span>
+            <span class="en">Turn the Android launcher into a session board.</span>
+          </h2>
+          <p class="copy">
+            <span class="zh">打开应用常常是慢路径。tmuxes 让你在桌面上直接看到构建、日志、监控、队列、agent 进度或项目自定义 TUI。真正的可编程能力不是来自某个 widget SDK，而是来自你已经会写的命令行。</span>
+            <span class="en">Opening the app is often the slow path. tmuxes lets builds, logs, monitors, queues, agent progress, and project-specific TUIs stay visible on the launcher. The programmable surface is not a widget SDK; it is the command line you already know.</span>
+          </p>
+          <div class="actions">
+            <a class="btn" href="https://github.com/Lightcone-ZhangYifa/tmuxes#semi-transparent-widgets">
+              <span class="zh">看 README 示例</span><span class="en">See README examples</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="showcase">
+          <img src="assets/readme/tmuxes-widget-layouts.png" alt="Four semi-transparent tmuxes launcher widget layouts">
+          <p class="caption">
+            <span class="zh">全屏命令中心、和应用图标共存、上下堆叠 session、多尺寸状态面板。</span>
+            <span class="en">Full-screen command center, app-icon coexistence, stacked sessions, and dense mixed-size dashboards.</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-label="Programmable widget example">
+      <div class="wrap split">
+        <div class="code-panel panel">
+          <div class="bar">
+            <span>widget-workspace.yml</span>
+            <span class="muted">tmuxes</span>
+          </div>
+          <pre><code><span class="muted"># Bind a launcher surface to real terminal output</span>
+server: prod-bastion
+session: agent-dashboard
+appearance:
+  opacity: 0.78
+  fontSizeSp: 12
+command:
+  - tmux
+  - new-session
+  - -A
+  - -s
+  - agent-dashboard
+  - ./scripts/mobile-status-board</code></pre>
+        </div>
+
+        <div class="panel">
+          <span class="kicker">
+            <span class="zh">从命令到表面</span><span class="en">From command to surface</span>
+          </span>
+          <h2>
+            <span class="zh">会写 CLI，就能设计自己的移动仪表盘。</span>
+            <span class="en">If you can write a CLI, you can design your mobile dashboard.</span>
+          </h2>
+          <p class="copy">
+            <span class="zh">CI 状态、服务器指标、队列长度、部署进度、agent 输出、IoT 面板、家庭实验室监控——只要终端能输出，tmuxes 就能把它变成桌面状态。</span>
+            <span class="en">CI status, server metrics, queue depth, deployment progress, agent output, IoT panels, homelab monitoring—if the terminal can print it, tmuxes can make it ambient.</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="topology">
+      <div class="wrap split">
+        <div class="panel diagram">
+          <div class="path" aria-hidden="true">
+            <svg viewBox="0 0 640 430" preserveAspectRatio="none">
+              <path d="M140 82 C260 50 392 70 480 150"></path>
+              <path d="M482 185 C420 230 340 270 230 330"></path>
+              <path d="M482 185 C540 220 550 300 512 354"></path>
+            </svg>
+          </div>
+          <div class="node phone">
+            <strong>Android</strong>
+            <span><span class="zh">终端、输入、磁贴、Forwarding 入口</span><span class="en">Terminal, input, widgets, forwarding entry</span></span>
+          </div>
+          <div class="node bastion">
+            <strong>bastion</strong>
+            <span><span class="zh">父服务器 / SSH direct-tcpip</span><span class="en">Parent server / SSH direct-tcpip</span></span>
+          </div>
+          <div class="node internal">
+            <strong>internal-host</strong>
+            <span><span class="zh">自己的认证、host key、tmux session</span><span class="en">Own auth, host key, tmux session</span></span>
+          </div>
+          <div class="node preview">
+            <strong>localhost:3000</strong>
+            <span><span class="zh">私有 preview 通过 local forward 打开</span><span class="en">Private preview opened through local forward</span></span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <span class="kicker">
+            <span class="zh">SSH Forwarding + 父子服务器</span><span class="en">Forwarding + parent-child servers</span>
+          </span>
+          <h2>
+            <span class="zh">真实网络不是一跳，tmuxes 不把它拍扁。</span>
+            <span class="en">Real networks are not flat, so tmuxes does not flatten them.</span>
+          </h2>
+          <p class="copy">
+            <span class="zh">堡垒机、实验室网络、VPN 边缘、云内网、家庭服务器都可以用父子树表达。父服务器提供 ProxyJump 风格通道；子服务器仍然保留自己的 SSH 客户端、host-key 校验、keepalive、forwarding 规则、tmux session 和凭据。</span>
+            <span class="en">Bastions, lab networks, VPN edges, cloud private networks, and homelabs can be represented as parent-child trees. The parent provides a ProxyJump-style path while the child keeps its own SSH client, host-key verification, keepalive, forwarding rules, tmux sessions, and credentials.</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-label="Difference from typical mobile terminals">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="kicker">
+            <span class="zh">为什么不同</span><span class="en">Why it feels different</span>
+          </span>
+          <h2>
+            <span class="zh">手机端不应该意味着降级。</span>
+            <span class="en">Mobile should not mean downgraded.</span>
+          </h2>
+        </div>
+
+        <div class="compare">
+          <div class="compare-grid">
+            <div class="compare-col">
+              <h3><span class="zh">普通手机终端</span><span class="en">Typical mobile terminal</span></h3>
+              <ul>
+                <li><span class="zh">SSH session 像绑在一个应用页面上。</span><span class="en">SSH sessions feel tied to one app instance.</span></li>
+                <li><span class="zh">Coding agent 变成另一个聊天框或独立移动应用。</span><span class="en">Coding agents become separate chat boxes or mobile-only apps.</span></li>
+                <li><span class="zh">想看状态，必须打开应用、找 tab、重新 attach。</span><span class="en">Checking state means opening the app, finding a tab, and reconnecting.</span></li>
+                <li><span class="zh">堡垒机、内网机器、端口转发散落在不同工具里。</span><span class="en">Bastions, private hosts, and port forwarding are scattered across tools.</span></li>
+              </ul>
+            </div>
+
+            <div class="compare-col">
+              <h3><span class="zh">tmuxes</span><span class="en">tmuxes</span></h3>
+              <ul>
+                <li><span class="zh">手机、平板、桌面 attach 同一个 tmux 现场。</span><span class="en">Phone, tablet, and desktop attach to the same tmux workspace.</span></li>
+                <li><span class="zh">Codex CLI、Claude Code、编辑器和测试继续跑在真实终端里。</span><span class="en">Codex CLI, Claude Code, editors, and tests keep running in the real terminal.</span></li>
+                <li><span class="zh">桌面磁贴让重要 session 不打开应用也可见。</span><span class="en">Launcher widgets keep important sessions visible before opening the app.</span></li>
+                <li><span class="zh">SSH Forwarding、父子服务器和 host-key 信任都在同一工作流。</span><span class="en">Forwarding, parent-child topology, and host-key trust share one workflow.</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-label="Feature tour">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="kicker">
+            <span class="zh">功能展示</span><span class="en">Feature tour</span>
+          </span>
+          <h2>
+            <span class="zh">把开发者已经信任的终端工作流搬到移动端。</span>
+            <span class="en">Bring the terminal workflow developers already trust to mobile.</span>
+          </h2>
+        </div>
+
+        <div class="tiles">
+          <article class="tile">
+            <img src="assets/readme/01-agent-widgets.png" alt="Claude Code and Codex sessions shown as Android widgets">
+            <h3><span class="zh">Agent 常驻桌面</span><span class="en">Agents stay visible</span></h3>
+            <p><span class="zh">Claude Code 和 Codex 作为真实 CLI 运行在 tmux 中，再被渲染成桌面磁贴。</span><span class="en">Claude Code and Codex run as real CLI tools in tmux, then render as launcher widgets.</span></p>
+          </article>
+
+          <article class="tile">
+            <img src="assets/readme/02-htop-widget.png" alt="Full-screen htop widget from a real tmux session">
+            <h3><span class="zh">监控不用进应用</span><span class="en">Monitoring stays ambient</span></h3>
+            <p><span class="zh">全屏 htop widget 是真实 tmux session。资源监控、TUI、状态面板都能放到桌面。</span><span class="en">A full-screen htop widget is a real tmux session. Monitors, TUIs, and dashboards can live on the launcher.</span></p>
+          </article>
+
+          <article class="tile">
+            <img src="assets/readme/03-forwarding-effect.png" alt="Private web preview loaded through tmuxes SSH local forwarding">
+            <h3><span class="zh">Forwarding 能看到结果</span><span class="en">Forwarding shows results</span></h3>
+            <p><span class="zh">远端私有 preview 通过 local SSH forward，在手机浏览器中打开。</span><span class="en">A private remote preview opens in the phone browser through a local SSH forward.</span></p>
+          </article>
+
+          <article class="tile">
+            <img src="assets/readme/04-parent-child-servers.png" alt="Parent-child server hierarchy in tmuxes">
+            <h3><span class="zh">拓扑关系不拍扁</span><span class="en">Topology stays structured</span></h3>
+            <p><span class="zh">父子服务器把堡垒机、内网机器和嵌套主机的关系直接表达出来。</span><span class="en">Parent-child servers show bastions, private hosts, and nested machines as real relationships.</span></p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-label="Input and quality">
+      <div class="wrap split">
+        <div class="panel">
+          <span class="kicker">
+            <span class="zh">Android 输入</span><span class="en">Android input</span>
+          </span>
+          <h2>
+            <span class="zh">终端输入不能糊弄。</span>
+            <span class="en">Terminal input cannot be faked.</span>
+          </h2>
+          <p class="copy">
+            <span class="zh">方向键、Home、End、Tab、Delete、Enter、IME 组合输入、中文日文输入、语音输入、粘贴、选择复制、bracketed paste、modifier 和 Fn 页面都应该按终端语义正确工作。</span>
+            <span class="en">Arrows, Home, End, Tab, Delete, Enter, IME composition, Chinese and Japanese input, voice dictation, paste, selection copy, bracketed paste, modifiers, and Fn pages should all behave with terminal semantics.</span>
+          </p>
+        </div>
+
+        <div class="panel">
+          <span class="kicker">
+            <span class="zh">贡献方向</span><span class="en">Contribute</span>
+          </span>
+          <h2>
+            <span class="zh">一起打磨移动终端体验。</span>
+            <span class="en">Help shape the mobile terminal experience.</span>
+          </h2>
+          <p class="copy">
+            <span class="zh">欢迎贡献 first-run onboarding、更多 Linux shell 适配、Windows/psmux 探索、CLI-native vibe-coding 示例、widget-focused TUI，以及未来 iOS 方向。</span>
+            <span class="en">Contributions are welcome around first-run onboarding, more Linux shells, Windows through psmux, CLI-native vibe-coding examples, widget-focused TUIs, and future iOS work.</span>
+          </p>
+          <div class="actions">
+            <a class="btn" href="https://github.com/Lightcone-ZhangYifa/tmuxes/blob/main/CONTRIBUTING.md">
+              <span class="zh">阅读贡献指南</span><span class="en">Read contributing guide</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="download">
+      <div class="wrap cta">
+        <div class="cta-content">
+          <div>
+            <span class="kicker">
+              <span class="zh">开始使用</span><span class="en">Start now</span>
+            </span>
+            <h2>
+              <span class="zh">把你最重要的远程 session 放进口袋，也放到桌面。</span>
+              <span class="en">Put your most important remote sessions in your pocket—and on your launcher.</span>
+            </h2>
+          </div>
+
+          <div class="actions">
+            <a class="btn primary" href="https://github.com/Lightcone-ZhangYifa/tmuxes/releases/latest">
+              <span class="zh">下载最新版本</span><span class="en">Download latest</span>
+            </a>
+            <a class="btn" id="readme-link" href="https://github.com/Lightcone-ZhangYifa/tmuxes/blob/main/README.zh-CN.md">
+              <span class="zh">中文 README</span><span class="en">English README</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>tmuxes · GPL-3.0-only</span>
+      <span>
+        <span class="zh">独立软件，与 tmux 项目没有从属关系。</span>
+        <span class="en">Independent software; not affiliated with tmux.</span>
+      </span>
+    </div>
+  </footer>
+
+  <script>
+    const body = document.body;
+    const buttons = document.querySelectorAll("[data-set-lang]");
+    const terminal = document.querySelector("#terminal-lines");
+    const readmeLink = document.querySelector("#readme-link");
+
+    const terminalCopy = {
+      zh: [
+        ["$", "ssh prod-bastion"],
+        ["✓", "host key verified · parent online"],
+        ["$", "tmux attach -t agent-dashboard"],
+        ["●", "Codex CLI 继续跑测试，Claude Code 留在同一个 session"],
+        ["↳", "local forward localhost:3000 → internal preview"],
+        ["▣", "Android launcher widget 正在渲染实时终端输出"]
+      ],
+      en: [
+        ["$", "ssh prod-bastion"],
+        ["✓", "host key verified · parent online"],
+        ["$", "tmux attach -t agent-dashboard"],
+        ["●", "Codex CLI keeps testing; Claude Code stays in the same session"],
+        ["↳", "local forward localhost:3000 → internal preview"],
+        ["▣", "Android launcher widget renders live terminal output"]
+      ]
+    };
+
+    function setLanguage(lang) {
+      body.dataset.lang = lang;
+      document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+      localStorage.setItem("tmuxes-page-lang", lang);
+      buttons.forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.setLang === lang));
+      });
+      if (readmeLink) {
+        readmeLink.href = lang === "zh"
+          ? "https://github.com/Lightcone-ZhangYifa/tmuxes/blob/main/README.zh-CN.md"
+          : "https://github.com/Lightcone-ZhangYifa/tmuxes/blob/main/README.md";
+      }
+      renderTerminal(lang);
+    }
+
+    function renderTerminal(lang) {
+      terminal.innerHTML = "";
+      terminalCopy[lang].forEach(([prompt, text], index) => {
+        const row = document.createElement("div");
+        row.className = "term-line";
+        row.style.animationDelay = `${index * 70}ms`;
+        const left = document.createElement("span");
+        left.className = index % 3 === 0 ? "prompt" : index % 3 === 1 ? "cyan" : "amber";
+        left.textContent = prompt;
+        const right = document.createElement("span");
+        right.textContent = text;
+        row.append(left, right);
+        terminal.append(row);
+      });
+    }
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => setLanguage(button.dataset.setLang));
+    });
+
+    const preferred = localStorage.getItem("tmuxes-page-lang")
+      || (navigator.language && navigator.language.toLowerCase().startsWith("zh") ? "zh" : "en");
+    setLanguage(preferred);
+  </script>
+</body>
+</html>
