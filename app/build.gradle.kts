@@ -143,8 +143,8 @@ dependencies {
     implementation("com.hierynomus:sshj:0.40.0")
 
     // Bouncy Castle for crypto
-    implementation("org.bouncycastle:bcprov-jdk18on:1.84")
-    implementation("org.bouncycastle:bcpkix-jdk18on:1.84")
+    implementation("org.bouncycastle:bcprov-jdk18on:1.85")
+    implementation("org.bouncycastle:bcpkix-jdk18on:1.85")
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
